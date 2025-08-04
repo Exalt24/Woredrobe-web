@@ -7,7 +7,8 @@ import { Header } from '@/components/layout/header'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'WOREDROBE - Your style story, one outfit at a time',
+  title: 'Woredrobe',
+  keywords: ['fashion', 'sustainable fashion', 'outfit tracker', 'wardrobe management'],
   description: 'Document and celebrate the outfits you actually wear. Join the anti-fast fashion community.',
 }
 
