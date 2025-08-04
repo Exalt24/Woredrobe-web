@@ -15,7 +15,7 @@ export default function RegisterPage() {
             </div>
           </Link>
           
-          <h2 className="heading-lg">Join WOREDROBE</h2>
+          <h2 className="heading-lg text-gray-500">Join WOREDROBE</h2>
           <p className="mt-2 text-gray-600">
             Start documenting your style story
           </p>
