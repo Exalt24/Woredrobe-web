@@ -1,58 +1,67 @@
 'use client'
-
 import { createContext, useContext, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
+import { useToast } from '@/components/ui/toast'
 import { User } from '@supabase/supabase-js'
 
-interface AuthContextType {
+interface MinimalAuthContextType {
   user: User | null
-  loading: boolean
   signOut: () => Promise<void>
+  // No loading state needed - we start with server data
 }
 
-const AuthContext = createContext<AuthContextType>({
+const MinimalAuthContext = createContext<MinimalAuthContextType>({
   user: null,
-  loading: true,
   signOut: async () => {},
 })
 
-export const useAuth = () => {
-  const context = useContext(AuthContext)
+// Only use this hook for signOut - components should get user via props
+export const useMinimalAuth = () => {
+  const context = useContext(MinimalAuthContext)
   if (!context) {
-    throw new Error('useAuth must be used within AuthProvider')
+    throw new Error('useMinimalAuth must be used within MinimalAuthProvider')
   }
   return context
 }
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+export const useUser = () => {
+  const { user } = useMinimalAuth()
+  return user
+}
+
+interface MinimalAuthProviderProps {
+  children: React.ReactNode
+  initialUser: User | null
+}
+
+export function MinimalAuthProvider({ children, initialUser }: MinimalAuthProviderProps) {
+  const [user, setUser] = useState<User | null>(initialUser)
   const supabase = createClient()
+  const router = useRouter()
+  const { toast } = useToast()
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-      setLoading(false)
-    }
-
-    getUser()
-
+    // Only listen for auth changes - no initial fetch needed
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
-      setLoading(false)
     })
-
     return () => subscription.unsubscribe()
   }, [supabase.auth])
 
   const signOut = async () => {
-    await supabase.auth.signOut()
+    try {
+      await supabase.auth.signOut()
+      toast.success("You've been signed out successfully")
+      router.push('/')
+    } catch (error) {
+      toast.error("Failed to sign out", "Error")
+    }
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, signOut }}>
+    <MinimalAuthContext.Provider value={{ user, signOut }}>
       {children}
-    </AuthContext.Provider>
+    </MinimalAuthContext.Provider>
   )
 }

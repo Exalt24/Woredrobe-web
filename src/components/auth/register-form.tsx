@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/toast'
 import { useRouter } from 'next/navigation'
 
 export function RegisterForm() {
@@ -10,14 +11,13 @@ export function RegisterForm() {
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
   const supabase = createClient()
   const router = useRouter()
+  const { toast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setMessage('')
 
     try {
       const { error } = await supabase.auth.signUp({
@@ -33,7 +33,10 @@ export function RegisterForm() {
 
       if (error) throw error
 
-      setMessage('Check your email for the confirmation link!')
+      toast.success(
+        "Account created successfully! Check your email for the confirmation link.",
+        "Welcome to WOREDROBE!"
+      )
       
       // Optional: Redirect to login page after a delay
       setTimeout(() => {
@@ -41,40 +44,33 @@ export function RegisterForm() {
       }, 3000)
       
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'An error occurred')
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred'
+      toast.error(errorMessage, "Registration Failed")
     } finally {
       setLoading(false)
     }
   }
 
   const handleGoogleSignUp = async () => {
-    setMessage('')
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-    if (error) setMessage(error.message)
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+      
+      if (error) throw error
+      
+      toast.info("Redirecting to Google...")
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Google sign up failed'
+      toast.error(errorMessage, "Google Sign Up Failed")
+    }
   }
 
   return (
     <div className="space-y-6">
-      {message && (
-        <div className={`p-4 rounded-lg ${
-          message.includes('Check your email') 
-            ? 'bg-green-50 text-green-700' 
-            : 'bg-red-50 text-red-700'
-        }`}>
-          {message}
-          {message.includes('Check your email') && (
-            <p className="text-sm mt-2">
-              You&apos;ll be redirected to the login page in a few seconds.
-            </p>
-          )}
-        </div>
-      )}
-
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">

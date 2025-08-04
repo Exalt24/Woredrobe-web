@@ -1,59 +1,61 @@
 'use client'
-
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/toast'
 import { useRouter } from 'next/navigation'
 
 export function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
   const supabase = createClient()
   const router = useRouter()
+  const { toast } = useToast()
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setMessage('')
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
-      
+     
       if (error) throw error
-      
+     
+      toast.success("Welcome back! You've been signed in successfully.")
       // Redirect to feed on successful login
       router.push('/feed')
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'An error occurred')
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred'
+      toast.error(errorMessage, "Sign In Failed")
     } finally {
       setLoading(false)
     }
   }
 
   const handleGoogleSignIn = async () => {
-    setMessage('')
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-    if (error) setMessage(error.message)
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+      
+      if (error) throw error
+      
+      toast.info("Redirecting to Google...")
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Google sign in failed'
+      toast.error(errorMessage, "Google Sign In Failed")
+    }
   }
 
   return (
     <div className="space-y-6">
-      {message && (
-        <div className="p-4 rounded-lg bg-red-50 text-red-700 text-sm">
-          {message}
-        </div>
-      )}
-
       <form onSubmit={handleSignIn} className="space-y-4">
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
@@ -69,7 +71,6 @@ export function LoginForm() {
             placeholder="Enter your email"
           />
         </div>
-
         <div>
           <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
             Password
@@ -84,7 +85,6 @@ export function LoginForm() {
             placeholder="Enter your password"
           />
         </div>
-
         <Button type="submit" loading={loading} className="w-full">
           Sign In
         </Button>
