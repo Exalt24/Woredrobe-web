@@ -1,4 +1,4 @@
-    import { TrendingUp, Hash, Clock, Heart, UserPlus, Sparkles } from 'lucide-react'
+import { TrendingUp, Hash, Clock, Heart, UserPlus, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getServerUser } from '@/lib/auth/session'
 import Link from 'next/link'

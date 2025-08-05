@@ -235,7 +235,7 @@ export default function UploadPage() {
               className="rounded"
             />
             <label htmlFor="outfit-repeat" className="text-sm text-gray-700">
-              This is an outfit repeat (and I'm proud of it!) 💚
+              This is an outfit repeat (and I&apos;m proud of it!) 💚
             </label>
           </div>
 
