@@ -29,18 +29,15 @@ export function Header({ user: serverUser }: HeaderProps) {
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+      <div>
+        <div className="flex items-center">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">W</span>
-            </div>
-            <span className="font-bold text-xl gradient-text">WOREDROBE</span>
-          </Link>
+          {/* <Link href="/" className="flex items-center space-x-2">
+            <span className=" text-xl">Woredrobe</span>
+          </Link> */}
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
+          <nav className="hidden md:flex items-center space-x-6 h-26 w-full border">
             {currentUser ? (
               <>
                 <Link href="/feed" className="nav-link flex items-center gap-2">
@@ -79,16 +76,16 @@ export function Header({ user: serverUser }: HeaderProps) {
               </>
             ) : (
               <>
-                <Link href="/explore" className="nav-link">
+                <Link href="/explore" className="nav-link flex-1 flex items-center justify-center h-full border-r">
                   Explore
                 </Link>
-                <Link href="/feed" className="nav-link">
+                <Link href="/feed" className="nav-link flex-1 flex items-center justify-center h-full border-r">
                   Community
                 </Link>
-                <Link href="/auth/login">
+                <Link href="/auth/login" className="nav-link flex-1 flex items-center justify-center h-full border-r" >
                   <Button variant="ghost">Sign In</Button>
                 </Link>
-                <Link href="/auth/register">
+                <Link href="/auth/register" className="nav-link flex-1 flex items-center justify-center h-full">
                   <Button className="bg-primary-600 hover:bg-primary-700">Join WOREDROBE</Button>
                 </Link>
               </>
